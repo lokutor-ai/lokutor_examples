@@ -18,7 +18,7 @@ output_stream = None
 
 # Audio Config
 INPUT_RATE = 16000
-OUTPUT_RATE = 44100
+OUTPUT_RATE = 44100 # Reset to standard rate
 CHANNELS = 1
 FORMAT = pyaudio.paInt16
 CHUNK_SIZE = 2048 # Smaller chunks for lower latency
@@ -49,20 +49,18 @@ def on_message(ws, message):
     # --- Speaker Output Loop ---
     if audio_data and output_stream:
         if IS_MAC:
-            # Up-mix Mono(24k) to Stereo(44.1k/48k) for Mac hardware
-            # We duplicate each sample twice (2x Rate) to fill the 44.1k buffer faster
+            # Expand Mono to Stereo for Mac hardware compatibility (preserving 44.1kHz rate)
             stereo_message = bytearray()
-            GAIN_BOOST = 1.5
+            GAIN_BOOST = 1.2
             for i in range(0, len(audio_data), 2):
                 if i + 1 >= len(audio_data): break
                 sample = int.from_bytes(audio_data[i:i+2], byteorder='little', signed=True)
                 sample = max(-32768, min(32767, int(sample * GAIN_BOOST)))
                 sample_bytes = sample.to_bytes(2, byteorder='little', signed=True)
                 
-                # Write to L/R twice each (2x samples = 48kHz output)
-                for _ in range(2):
-                    stereo_message.extend(sample_bytes) # Left
-                    stereo_message.extend(sample_bytes) # Right
+                # Write to L and R channels (1 stereo frame)
+                stereo_message.extend(sample_bytes) # Left
+                stereo_message.extend(sample_bytes) # Right
             output_stream.write(bytes(stereo_message))
         else:
             output_stream.write(audio_data)
