@@ -1,0 +1,21 @@
+# Environments
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log properly
+yarn-error.log
+
+# Python
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Mac OS
+.DS_Store
+
+integrations/

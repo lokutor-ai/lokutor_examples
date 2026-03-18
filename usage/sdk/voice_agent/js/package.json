@@ -1,0 +1,16 @@
+{
+  "name": "lokutor-voice-agent-example",
+  "version": "1.0.0",
+  "description": "Minimal Lokutor Voice Agent example for Node.js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@lokutor/sdk": "^1.0.0",
+    "dotenv": "^16.4.0",
+    "node-record-lpcm16": "^1.0.1",
+    "speaker": "^0.5.5"
+  }
+}

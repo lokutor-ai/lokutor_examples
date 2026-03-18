@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lokutor Voice Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">LOKUTOR</div>
+            <div class="status-badge" id="botStatus">Offline</div>
+        </header>
+
+        <main>
+            <div class="orb-case">
+                <div class="orb" id="voiceOrb"></div>
+                <div class="orb-glow"></div>
+            </div>
+
+            <div class="transcript-box" id="transcript">
+                <div class="msg system">Click 'Start Conversation' to begin.</div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="actionBtn" class="btn primary">Start Conversation</button>
+            <div class="hint">Microphone access required</div>
+        </footer>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>
