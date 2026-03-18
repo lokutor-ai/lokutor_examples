@@ -40,4 +40,5 @@ If you start talking while the AI is still speaking, the client immediately dete
 The central "Voice Orb" isn't just an animation—it scales its size based on the actual volume of your microphone, providing immediate visual confirmation that the AI can "hear" you.
 
 ---
-*Note: This example uses raw WebSockets for the relay. For a version using the official Lokutor SDK on the backend, see the `usage/sdk/voice_agent/web_relay` folder.*
+*Note: This example uses raw WebSockets for the relay. For a version using the official Lokutor SDK on the backend, see the [usage/sdk/voice_agent/web_relay](../../../sdk/voice_agent/web_relay) folder.*
+

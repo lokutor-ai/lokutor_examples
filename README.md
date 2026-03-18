@@ -1,97 +1,62 @@
 # 🦜 Lokutor Examples
 
-Welcome to the **Lokutor Examples** repository! This repo provides dead-simple, ready-to-use examples for [Lokutor](https://docs.lokutor.com/), implemented in both **Python** and **JavaScript/TypeScript**.
+Welcome to the **Lokutor Examples** repository! This repo provides dead-simple, ready-to-use examples for [Lokutor](https://docs.lokutor.com/), the lowest-latency conversational AI engine.
 
 ## 📂 Repository Structure
 
-The repo is divided into two tracks:
+The examples are divided into two main tracks:
 
-### 1. Core Usage (`usage/`)
-- **`sdk/`**: Using the high-level SDK (e.g. `TTSClient`, `VoiceAgentClient`).
-  - `tts/`: Real-time streaming Text-to-Speech playback.
-  - `voice_agent/`: Full conversational AI loop (STT -> LLM -> TTS).
-- **`api/`**: Bypassing the SDK to use raw WebSockets directly.
-  - `tts/`: Raw WebSocket TTS request/response.
-  - `voice_agent/`: Manually orchestrating voice-chat events and chunks.
+### 1. Core Usage ([usage/](./usage))
+- **[SDK-driven](./usage/sdk)** (Recommended): Low-code integration using the high-level Lokutor libraries.
+  - **[TTS Playback](./usage/sdk/tts)**: Real-time streaming Text-to-Speech directly to speakers.
+  - **[Voice Agent](./usage/sdk/voice_agent)**: Full conversational AI loop with battery-included hardware management.
+- **[API-driven (Raw)](./usage/api)**: Lower-level control using raw WebSockets directly.
+  - **[TTS API](./usage/api/tts)**: Direct WebSocket request/response for audio chunks.
+  - **[Voice Chat API](./usage/api/voice_agent)**: Manual orchestration of STT, LLM, and TTS events.
 
-### 2. Integrations (`integrations/`)
-- **`telnyx/`**: Bridge Lokutor to inbound/outbound PSTN voice calls via Telnyx.
-- **`twilio/`**: SIP media streams via Twilio.
-- **`whatsapp/`**: Voice notes and audio replies via WhatsApp.
-- **`websocket_frontend/`**: Pairing with browserfrontends/avatars.
+### 2. Integrations ([integrations/](./integrations))
+- **[Telnyx](./integrations/telnyx)**: Inbound/outbound PSTN voice calls.
+- **[Twilio](./integrations/twilio)**: SIP media streams and telephony.
+- **[WhatsApp](./integrations/whatsapp)**: AI voice notes and audio replies.
+- **[WebSocket Frontend](./integrations/websocket_frontend)**: The "Proxy Bridge" architecture for browser-based avatars (React/Vue/Vanilla).
 
 ---
 
-## 🚀 Getting Started (Setup Once)
+## 🚀 Getting Started
 
-Instead of cluttering the folders, we consolidate dependencies at the repository root.
+Dependencies are consolidated at the repository root to ensure version parity.
 
-### 1. Configure `.env`
-Copy the template and paste your **Lokutor API Key**:
+### 1. Configure Environment
 ```bash
 cp .env.example .env
+# Edit .env and add your LOKUTOR_API_KEY
 ```
 
 ### 2. Install Dependencies
-
-**For Python:**
 ```bash
-# Recommended: use a venv in the root
-python3 -m venv venv
-source venv/bin/activate
+# Python
 pip install -r requirements.txt
-```
 
-**For Node.js:**
-```bash
+# Node.js
 npm install
 ```
 
 ---
 
-## 🏃 Running Examples
-
-Once you have installed the root dependencies, you can run any individual example:
-
-### From the Root Folder
-
-**Python Examples:**
-```bash
-# General format: python <path-to-main.py>
-python usage/sdk/tts/python/main.py
-```
-
-**Node.js Examples:**
-```bash
-# General format: node <path-to-index.js>
-node usage/api/tts/js/index.js
-```
-
-### From an Example Folder
-Alternatively, you can `cd` into any leaf folder. The provided scripts automatically search upwards for your `.env` and dependencies.
-
----
-
 ## 🏗️ Production Architecture & Security
 
-### Where does this code live?
-The examples in the `usage/` folder are **Backend scripts**. They use your master `LOKUTOR_API_KEY`, which must **NEVER** be exposed in a browser or client-side app.
+The examples in the `usage/` folder are primarily **Backend scripts**. They use your internal `LOKUTOR_API_KEY`, which must **NEVER** be exposed to a browser or client.
 
-### How to build a Browser-Based Voice Chat?
-In a real production environment, you should use a **Proxy Bridge** architecture:
-1. **Frontend (Browser)**: Captures Microphone audio (via Web Audio API) and sends it to **Your Backend** via a WebSocket.
-2. **Backend (Server)**: Securely authenticates the user, then proxies the audio stream to **Lokutor** using your API key.
-3. **Synthesis**: Lokutor sends the AI voice back to your Backend, which forwards it to the Browser for playback.
+### Building for the Browser?
+If you are building a web-based AI assistant, you should use a **Relay (Proxy Bridge)**:
+1. **Frontend**: Captures audio and sends it to your server via WebSocket.
+2. **Backend**: Proxies that audio to Lokutor securely using the SDK or API.
+3. **Synthesis**: The AI voice is returned to your server, then forwarded to the browser.
 
-👉 **See the [WebSocket Frontend Integration](integrations/websocket_frontend/)** for a complete, working demonstration of this architecture.
+👉 **See the [Web Relay Demonstration](./usage/sdk/voice_agent/web_relay)** for the simplest production-ready proxy implementation.
+👉 **See the [Advanced Frontend Integration](./integrations/websocket_frontend)** for pairing with visual avatars.
 
 ---
-
-## 🧠 Design Philosophy
-
-- **Zero Clutter**: Clean, single-file scripts without redundant boilerplate like local `package.json` files.
-- **Copy-Pasteability**: Even with root dependencies, each script is self-contained and easily portable to your own project.
-- **Documentation Parity**: Mapped directly to what you see at [docs.lokutor.com](https://docs.lokutor.com/).
 
 ## 📄 License
 This repository is licensed under the MIT License.

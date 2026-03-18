@@ -11,7 +11,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 3001; // Using 3001 to avoid conflicts
+const PORT = 3001; 
 const API_KEY = process.env.LOKUTOR_API_KEY;
 
 if (!API_KEY) {
@@ -28,31 +28,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 wss.on('connection', async (browserWs) => {
     console.log('🔗 Browser Client connected (SDK Relay)');
 
-    // 1. Initialize the official Lokutor SDK client
-    const lokutorClient = new VoiceAgentClient({
-        apiKey: API_KEY,
-        prompt: 'You are a helpful and polite AI assistant.',
-        
-        onTranscription: (text) => {
-            // Forward user's transcription to the browser
-            browserWs.send(JSON.stringify({ type: 'transcript', role: 'user', data: text }));
-        },
-        onResponse: (text) => {
-            // Forward AI's response to the browser
-            browserWs.send(JSON.stringify({ type: 'transcript', role: 'agent', data: text }));
-        },
-        onStatus: (status) => {
-            // Forward status (listening/speaking/interrupted)
-            browserWs.send(JSON.stringify({ type: 'status', data: status }));
-            console.log(`📡 Status: ${status}`);
+    // 1. Initialize the official Lokutor SDK client (Managed setup)
+    const lokutorClient = new VoiceAgentClient({ apiKey: API_KEY });
+
+    // Using the new Event Emitter API for all SDK events
+    lokutorClient.on('transcription', (text) => {
+        browserWs.send(JSON.stringify({ type: 'transcript', role: 'user', data: text }));
+    });
+
+    lokutorClient.on('response', (text) => {
+        browserWs.send(JSON.stringify({ type: 'transcript', role: 'agent', data: text }));
+    });
+
+    lokutorClient.on('audio', (data) => {
+        if (browserWs.readyState === WebSocket.OPEN) {
+            browserWs.send(data); // Send as binary chunk directly to browser
         }
     });
 
-    // 2. Handle audio coming from Lokutor -> Browser
-    lokutorClient.onAudio((data) => {
-        if (browserWs.readyState === WebSocket.OPEN) {
-            browserWs.send(data); // Send as binary chunk
-        }
+    lokutorClient.on('status', (status) => {
+        browserWs.send(JSON.stringify({ type: 'status', data: status }));
+        console.log(`📡 Status: ${status}`);
+    });
+
+    lokutorClient.on('ttfb', (ms) => {
+        console.log(`⏱️ TTFB: ${ms}ms`);
     });
 
     const connected = await lokutorClient.connect();
@@ -65,14 +65,13 @@ wss.on('connection', async (browserWs) => {
     // 3. Handle messages coming from Browser -> Backend
     browserWs.on('message', (data, isBinary) => {
         if (isBinary) {
-            // Browser sent raw PCM audio (16kHz mono)
+            // Forward raw PCM audio from browser directly to the SDK
             lokutorClient.sendAudio(Buffer.from(data));
         } else {
-            // Browser sent JSON (config updates, etc.)
             try {
                 const msg = JSON.parse(data.toString());
                 if (msg.type === 'prompt') {
-                    // Update the prompt on-the-fly if supported by your version
+                    // Update session prompt if supported
                     // lokutorClient.setPrompt(msg.data); 
                 }
             } catch(e) {}
@@ -86,7 +85,7 @@ wss.on('connection', async (browserWs) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`\n✨ SDK-BASED WEB RELAY RUNNING`);
+    console.log(`\n✨ SDK-BASED WEB RELAY RUNNING (v2.0)`);
     console.log(`🌍 URL: http://localhost:${PORT}`);
     console.log(`📦 Using official @lokutor/sdk`);
 });

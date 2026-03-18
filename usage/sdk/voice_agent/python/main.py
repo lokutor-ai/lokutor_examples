@@ -1,12 +1,12 @@
 import os
-import platform
+import signal
+import sys
 from dotenv import load_dotenv, find_dotenv
 from lokutor import VoiceAgentClient, VoiceStyle, Language
 
 # Load API key from root .env
 load_dotenv(find_dotenv())
 api_key = os.getenv("LOKUTOR_API_KEY")
-IS_MAC = platform.system() == "Darwin"
 
 def main():
     if not api_key:
@@ -17,28 +17,24 @@ def main():
     print("💡 Press Ctrl+C to end the conversation.")
     
     # Initialize high-level Voice Agent Client
-    # This automatically orchestrates STT, LLM, and TTS.
+    # Prompt is now optional (defaults to natural conversational AI)
     client = VoiceAgentClient(
         api_key=api_key,
         prompt="You are a helpful and natural conversational AI assistant.",
-        voice=VoiceStyle.F2,
+        voice=VoiceStyle.F2,    
         language=Language.ENGLISH,
-        # tools=[weather_tool] # Un-comment to enable function calling
+        # tools=[tool_name] # Un-comment to enable function calling
     )
     
     # Define tool handlers as properties on the client instance
     # client.on_tool_call = lambda name, args: print(f"🛠️ Tool call: {name}")
 
     try:
-        # start_conversation() handles local microphone capture and 
-        # audio playback using the SDK's built-in processing pipeline.
+        # start_conversation() now has fixed 'block' logic 
+        # and joined playback thread to prevent premature exits.
         client.start_conversation()
-    except KeyboardInterrupt:
-        print("\n👋 Disconnecting...")
     except Exception as e:
-        print(f"\n❌ Error: {e}")
-        if "PortAudio" in str(e):
-            print("💡 Tip: Ensure your Microphone is connected and has system permissions.")
+        print(f"\n❌ Execution Error: {e}")
     finally:
         client.disconnect()
 

@@ -37,4 +37,5 @@ In this SDK version, the **backend can "listen" to the conversation**. This is u
 *   **Session Management**: Attaching user IDs or session metadata before the connection is established.
 
 ---
-*Note: This example uses the same frontend as the standard `api/web_relay` to ensure consistency.*
+*Note: This example uses the same frontend as the standard [api/web_relay](../../../api/voice_agent/web_relay) to ensure consistency.*
+

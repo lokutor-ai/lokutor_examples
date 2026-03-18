@@ -30,4 +30,8 @@ node js/index.js
 ```
 
 ## Implementation Note
-In Node.js, we use `node-record-lpcm16` for capture and `speaker` for playback. For the most robust experience on Mac hardware, the output is configured for **44100Hz Stereo**, even if the AI voice itself is Mono.
+
+The SDK handles hardware orchestration automatically:
+- **Python**: Uses `PyAudio` and the internal processing pipeline.
+- **Node.js (v2.0+)**: Use `client.startManaged()` for zero-boilerplate microphone and speaker management. The SDK handles internal resampling and Mono-to-Stereo up-mixing for cross-platform compatibility (especially macOS).
+
